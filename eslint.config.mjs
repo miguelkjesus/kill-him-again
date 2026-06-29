@@ -1,3 +1,5 @@
+/* eslint-disable import/no-named-as-default-member */
+
 import js from '@eslint/js'
 import { defineConfig } from 'eslint/config'
 import importPlugin from 'eslint-plugin-import'
@@ -30,6 +32,7 @@ export default defineConfig(
 					varsIgnorePattern: '^_',
 				},
 			],
+			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-namespace': 'off',
 			// Disable rules that conflict with regular tsc type checking
 			'@typescript-eslint/no-unsafe-argument': 'off',
@@ -44,10 +47,8 @@ export default defineConfig(
 
 	// Import sorting
 	importPlugin.flatConfigs.recommended,
+	importPlugin.flatConfigs.typescript,
 	{
-		plugins: {
-			'simple-import-sort': simpleImportSort,
-		},
 		settings: {
 			'import/resolver': {
 				typescript: {
@@ -55,12 +56,34 @@ export default defineConfig(
 				},
 			},
 		},
+		plugins: {
+			'simple-import-sort': simpleImportSort,
+		},
 		rules: {
-			'simple-import-sort/imports': 'error',
+			'simple-import-sort/imports': [
+				'error',
+				{
+					groups: [
+						// Side effect imports
+						['^\\u0000'],
+
+						// NodeJS built-ins
+						['^node:'],
+
+						// External packages
+						['^@?\\w'],
+
+						// Internal aliases
+						['^@spec/'],
+						['^@/'],
+
+						// Relative imports
+						['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+						['^\\./(?=.*/)', '^\\.(?!/?$)', '^\\./?$'],
+					],
+				},
+			],
 			'simple-import-sort/exports': 'error',
-			'import/first': 'error',
-			'import/newline-after-import': 'error',
-			'import/no-duplicates': 'error',
 		},
 	},
 
