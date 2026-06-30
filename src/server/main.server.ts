@@ -1,5 +1,5 @@
-import { ScriptLoader } from 'shared/script-loader'
-import { Services } from 'shared/service-registry'
+import { ScriptLoader } from 'shared/modules/script-loader'
+import { Services } from 'shared/modules/service-registry'
 
 Services.Init()
 
