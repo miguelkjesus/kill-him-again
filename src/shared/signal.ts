@@ -40,10 +40,15 @@ namespace Signal {
 			return new Connection(this._once, callback)
 		}
 
-		Wait(predicate?: (...args: Args) => boolean) {
+		async Wait(predicate?: (...args: Args) => boolean) {
 			return new Promise<Args>((resolve) => {
+				if (!predicate) {
+					this.Once((...args) => resolve(args))
+					return
+				}
+
 				const connection = this.Connect((...args) => {
-					if (predicate && !predicate(...args)) return
+					if (predicate(...args)) return
 
 					connection.Disconnect()
 					resolve(args)

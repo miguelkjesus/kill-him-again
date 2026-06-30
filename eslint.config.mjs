@@ -34,6 +34,8 @@ export default defineConfig(
 			],
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-namespace': 'off',
+			// Disable rules that conflict with roblox-ts
+			'@typescript-eslint/no-require-imports': 'off',
 			// Disable rules that conflict with regular tsc type checking
 			'@typescript-eslint/no-unsafe-argument': 'off',
 			'@typescript-eslint/unbound-method': 'off',
