@@ -1,3 +1,5 @@
+import { RunService } from '@rbxts/services'
+
 import Service from './service'
 import Signal from './signal'
 
@@ -10,6 +12,7 @@ interface Services {
 	AddAsync<T extends new () => Service>(service: T): T
 	Get<S extends Service>(service: new () => S): Promise<S>
 	Remove<S extends Service>(service: new () => S): Promise<S>
+	Clear(): Promise<void>
 }
 
 const _InitialisedSignal = new Signal<[]>()
@@ -23,6 +26,10 @@ const servicesImpl = {
 	_services: new Map<new () => Service, Service>(),
 
 	Init() {
+		if (RunService.IsServer()) {
+			game.BindToClose(() => this.Clear().await())
+		}
+
 		this._isReady = true
 		this._InitialisedSignal.Fire()
 	},
@@ -35,7 +42,7 @@ const servicesImpl = {
 		const instance = new service()
 		this._services.set(service, instance)
 
-		if (!this.IsReady) {
+		if (!this.IsReady()) {
 			await this.Initialised.Wait()
 		}
 
@@ -73,6 +80,17 @@ const servicesImpl = {
 
 		this._services.delete(service)
 		return instance
+	},
+
+	async Clear() {
+		const stopPromises: Promise<void>[] = []
+
+		for (const [_, instance] of this._services) {
+			stopPromises.push(instance.Stop())
+		}
+
+		await Promise.all(stopPromises)
+		this._services.clear()
 	},
 }
 
