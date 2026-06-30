@@ -1,15 +1,16 @@
 import { RunService } from '@rbxts/services'
 
-import Service from './service'
-import Signal from './signal'
+import { Service } from './service'
+import { Signal, SignalEvent } from './signal'
 
-interface Services {
-	readonly Initialised: Signal.Event<[]>
+export interface Services {
+	readonly Initialised: SignalEvent<[]>
+
+	RegisterClass<T extends new () => Service>(this: void, service: T): T
 
 	Init(): void
 	IsReady(): boolean
 	Add<S extends Service>(service: new () => S): Promise<S>
-	AddAsync<T extends new () => Service>(service: T): T
 	Get<S extends Service>(service: new () => S): Promise<S>
 	Remove<S extends Service>(service: new () => S): Promise<S>
 	Clear(): Promise<void>
@@ -24,6 +25,11 @@ const servicesImpl = {
 	_isReady: false,
 
 	_services: new Map<new () => Service, Service>(),
+
+	RegisterClass<T extends new () => Service>(this: void, service: T) {
+		task.spawn(() => void Services.Add(service))
+		return service
+	},
 
 	Init() {
 		if (RunService.IsServer()) {
@@ -48,11 +54,6 @@ const servicesImpl = {
 
 		await instance.Start()
 		return instance
-	},
-
-	AddAsync<T extends new () => Service>(service: T) {
-		task.spawn(() => void this.Add(service))
-		return service
 	},
 
 	async Get<S extends Service>(service: new () => S) {
@@ -94,6 +95,4 @@ const servicesImpl = {
 	},
 }
 
-const Services: Services = servicesImpl
-
-export default Services
+export const Services: Services = servicesImpl

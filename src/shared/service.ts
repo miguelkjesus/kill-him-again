@@ -1,7 +1,7 @@
-import Signal from 'shared/signal'
+import { Signal } from './signal'
 
-abstract class Service {
-	private _state: Service.State = 'created'
+export abstract class Service {
+	private _state: ServiceState = 'created'
 
 	private readonly StartingSignal = new Signal<[]>()
 	readonly Starting = this.StartingSignal.Event
@@ -23,58 +23,43 @@ abstract class Service {
 
 	async Start() {
 		this._state = 'starting'
-		if (Service.OnRegister.implementedBy(this)) this.OnRegister()
+		if (IOnRegister(this)) this.OnRegister()
 		this.StartingSignal.Fire()
 
-		await Promise.defer<void>((resolve) => {
-			void Promise.try(() => this.OnStart()).then(() => {
-				this._state = 'running'
-				this.StartedSignal.Fire()
-				resolve()
-			})
-		})
+		await Promise.try(() => this.OnStart())
+		this._state = 'running'
+		this.StartedSignal.Fire()
 	}
 
 	async Stop() {
 		this._state = 'stopping'
 		this.StoppingSignal.Fire()
 
-		if (!Service.OnStop.implementedBy(this)) return
+		if (IOnStop(this)) {
+			await Promise.try(() => this.OnStop())
+		}
 
-		await Promise.defer<void>((resolve) => {
-			void Promise.try(() => this.OnStop()).then(() => {
-				this._state = 'stopped'
-				this.StoppedSignal.Fire()
-				resolve()
-			})
-		})
+		this._state = 'stopped'
+		this.StoppedSignal.Fire()
 	}
 }
 
-namespace Service {
-	export type State = 'created' | 'starting' | 'running' | 'stopping' | 'stopped'
+export type ServiceState = 'created' | 'starting' | 'running' | 'stopping' | 'stopped'
 
-	export interface OnRegister {
-		OnRegister(): void
-	}
-
-	export namespace OnRegister {
-		export function implementedBy(value: unknown): value is OnRegister {
-			return typeIs(value, 'table') && 'OnRegister' in value && typeIs(value.OnRegister, 'function')
-		}
-	}
-
-	export interface OnStop {
-		// Only guaranteed to be on server shutdown
-		// Only called on client on a manual `Service.Stop()`
-		OnStop(): void | Promise<void>
-	}
-
-	export namespace OnStop {
-		export function implementedBy(value: unknown): value is OnStop {
-			return typeIs(value, 'table') && 'OnStop' in value && typeIs(value.OnStop, 'function')
-		}
-	}
+export interface IOnRegister {
+	OnRegister(): void
 }
 
-export default Service
+export function IOnRegister(value: unknown): value is IOnRegister {
+	return typeIs(value, 'table') && 'OnRegister' in value && typeIs(value.OnRegister, 'function')
+}
+
+export interface IOnStop {
+	// Only guaranteed to be on server shutdown
+	// Only called on client on a manual `Service.Stop()`
+	OnStop(): void | Promise<void>
+}
+
+export function IOnStop(value: unknown): value is IOnStop {
+	return typeIs(value, 'table') && 'OnStop' in value && typeIs(value.OnStop, 'function')
+}

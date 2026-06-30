@@ -1,4 +1,4 @@
-interface ScriptLoader {
+export interface ScriptLoader {
 	FromInstances(instances: Instance[]): void
 	LoadChildrenOf(parent: Instance): void
 	LoadDescendantsOf(parent: Instance): void
@@ -7,7 +7,9 @@ interface ScriptLoader {
 const scriptLoaderImpl: ScriptLoader = {
 	FromInstances(instances: Instance[]) {
 		for (const instance of instances) {
-			if (instance.IsA('ModuleScript')) require(instance)
+			if (instance.IsA('ModuleScript')) {
+				task.spawn(() => require(instance))
+			}
 		}
 	},
 
@@ -20,6 +22,4 @@ const scriptLoaderImpl: ScriptLoader = {
 	},
 }
 
-const ScriptLoader: ScriptLoader = scriptLoaderImpl
-
-export default ScriptLoader
+export const ScriptLoader: ScriptLoader = scriptLoaderImpl

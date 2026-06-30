@@ -1,17 +1,17 @@
-import { ISignal } from './signal'
+import { ISignalConnection } from './signal'
 
-class Maid {
-	private _items = new Set<Maid.Cleanable>()
+export class Maid {
+	private _items = new Set<MaidCleanable>()
 
-	Add(item: Maid.Cleanable) {
+	Add(item: MaidCleanable) {
 		this._items.add(item)
 	}
 
-	Remove(item: Maid.Cleanable) {
+	Remove(item: MaidCleanable) {
 		this._items.delete(item)
 	}
 
-	Has(item: Maid.Cleanable) {
+	Has(item: MaidCleanable) {
 		this._items.has(item)
 	}
 
@@ -27,7 +27,7 @@ class Maid {
 		for (const item of this._items) {
 			if (item instanceof Maid) {
 				item.Clean()
-			} else if (IDestroyable.implementedBy(item)) {
+			} else if (IDestroyable(item)) {
 				item.Destroy()
 			} else {
 				item.Disconnect()
@@ -36,18 +36,12 @@ class Maid {
 	}
 }
 
-namespace Maid {
-	export type Cleanable = Maid | IDestroyable | ISignal.Connection
-}
-
-export default Maid
+export type MaidCleanable = Maid | IDestroyable | ISignalConnection
 
 export interface IDestroyable {
 	Destroy(): void
 }
 
-export namespace IDestroyable {
-	export function implementedBy(value: unknown): value is IDestroyable {
-		return typeIs(value, 'table') && 'Destroy' in value && typeIs(value.Destroy, 'function')
-	}
+export function IDestroyable(value: unknown): value is IDestroyable {
+	return typeIs(value, 'table') && 'Destroy' in value && typeIs(value.Destroy, 'function')
 }
