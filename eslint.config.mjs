@@ -8,7 +8,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import ts from 'typescript-eslint'
 
 export default defineConfig(
-	{ ignores: ['out/**/*'] },
+	{ ignores: ['out/**/*', 'types/**/*'] },
 
 	// js/ts lint settings
 	js.configs.recommended,
