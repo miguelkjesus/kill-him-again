@@ -6,7 +6,7 @@ import { Signal, SignalEvent } from './signal'
 export interface Services {
 	readonly Initialised: SignalEvent<[]>
 
-	RegisterClass<T extends new () => Service>(this: void, service: T): T
+	Declare<T extends new () => Service>(this: void, service: T): T
 
 	Init(): void
 	IsReady(): boolean
@@ -26,7 +26,7 @@ const servicesImpl = {
 
 	_services: new Map<new () => Service, Service>(),
 
-	RegisterClass<T extends new () => Service>(this: void, service: T) {
+	Declare<T extends new () => Service>(this: void, service: T) {
 		task.spawn(() => void Services.Add(service))
 		return service
 	},
