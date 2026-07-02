@@ -24,6 +24,10 @@ export class CameraService extends Service {
 		)
 	}
 
+	protected OnStop() {
+		this._Maid.Clean()
+	}
+
 	protected OnPreRender() {
 		if (this._Camera === undefined) return
 

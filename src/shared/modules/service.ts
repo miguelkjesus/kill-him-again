@@ -78,6 +78,8 @@ export abstract class Service {
 			await Promise.try(() => this.OnStop!())
 		}
 
+		this.__maid.Clean()
+
 		this.SetState('stopped')
 	}
 }
