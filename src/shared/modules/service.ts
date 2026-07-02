@@ -4,8 +4,8 @@ import { Maid } from './maid'
 import { Signal } from './signal'
 
 export abstract class Service {
-	private _state: ServiceState = 'registering'
-	private _maid = new Maid()
+	private __state: ServiceState = 'registering'
+	private __maid = new Maid()
 
 	private readonly StateChangedSignal = new Signal<[state: ServiceState]>()
 	readonly StateChanged = this.StateChangedSignal.Event
@@ -31,7 +31,7 @@ export abstract class Service {
 	protected OnStop?(): void | Promise<void>
 
 	private SetState(state: ServiceState) {
-		this._state = state
+		this.__state = state
 		this.StateChangedSignal.Fire(state)
 
 		switch (state) {
@@ -51,7 +51,7 @@ export abstract class Service {
 	}
 
 	GetState() {
-		return this._state
+		return this.__state
 	}
 
 	async Start() {
@@ -64,7 +64,7 @@ export abstract class Service {
 
 		if (RunService.IsClient()) {
 			if ('OnPreRender' in this) {
-				this._maid.Add(RunService.PreRender.Connect(() => void Promise.try(() => this.OnPreRender!())))
+				this.__maid.Add(RunService.PreRender.Connect(() => void Promise.try(() => this.OnPreRender!())))
 			}
 		}
 
