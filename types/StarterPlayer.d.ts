@@ -53,7 +53,14 @@ interface StarterPlayer extends Instance {
 		};
 		TS: Folder & {
 			main: LocalScript;
-			services: Folder;
+			services: Folder & {
+				camera: ModuleScript & {
+					["camera-state"]: ModuleScript;
+					["camera-service"]: ModuleScript;
+					["camera-mode"]: ModuleScript;
+					["camera-modifier"]: ModuleScript;
+				};
+			};
 		};
 		RbxCharacterSounds: LocalScript & {
 			AtomicBinding: ModuleScript;
