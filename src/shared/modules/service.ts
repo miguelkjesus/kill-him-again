@@ -1,7 +1,14 @@
+import { RunService } from '@rbxts/services'
+
+import { Maid } from './maid'
 import { Signal } from './signal'
 
 export abstract class Service {
-	private _state: ServiceState = 'created'
+	private _state: ServiceState = 'registering'
+	private _maid = new Maid()
+
+	private readonly StateChangedSignal = new Signal<[state: ServiceState]>()
+	readonly StateChanged = this.StateChangedSignal.Event
 
 	private readonly StartingSignal = new Signal<[]>()
 	readonly Starting = this.StartingSignal.Event
@@ -15,51 +22,64 @@ export abstract class Service {
 	private readonly StoppedSignal = new Signal<[]>()
 	readonly Stopped = this.StoppedSignal.Event
 
-	protected abstract OnStart(): void | Promise<void>
+	protected OnRegister?(): void
+
+	protected OnStart?(): void | Promise<void>
+
+	protected OnPreRender?(): void | Promise<void>
+
+	protected OnStop?(): void | Promise<void>
+
+	private SetState(state: ServiceState) {
+		this._state = state
+		this.StateChangedSignal.Fire(state)
+
+		switch (state) {
+			case 'starting':
+				this.StartingSignal.Fire()
+				break
+			case 'running':
+				this.StartedSignal.Fire()
+				break
+			case 'stopping':
+				this.StoppingSignal.Fire()
+				break
+			case 'stopped':
+				this.StoppedSignal.Fire()
+				break
+		}
+	}
 
 	GetState() {
 		return this._state
 	}
 
 	async Start() {
-		this._state = 'starting'
-		if (IOnRegister(this)) this.OnRegister()
-		this.StartingSignal.Fire()
+		this.OnRegister?.()
+		this.SetState('starting')
 
-		await Promise.try(() => this.OnStart())
-		this._state = 'running'
-		this.StartedSignal.Fire()
+		if ('OnStart' in this) {
+			await Promise.try(() => this.OnStart!())
+		}
+
+		if (RunService.IsClient()) {
+			if ('OnPreRender' in this) {
+				this._maid.Add(RunService.PreRender.Connect(() => void Promise.try(() => this.OnPreRender!())))
+			}
+		}
+
+		this.SetState('running')
 	}
 
 	async Stop() {
-		this._state = 'stopping'
-		this.StoppingSignal.Fire()
+		this.SetState('stopping')
 
-		if (IOnStop(this)) {
-			await Promise.try(() => this.OnStop())
+		if ('OnStop' in this) {
+			await Promise.try(() => this.OnStop!())
 		}
 
-		this._state = 'stopped'
-		this.StoppedSignal.Fire()
+		this.SetState('stopped')
 	}
 }
 
-export type ServiceState = 'created' | 'starting' | 'running' | 'stopping' | 'stopped'
-
-export interface IOnRegister {
-	OnRegister(): void
-}
-
-export function IOnRegister(value: unknown): value is IOnRegister {
-	return typeIs(value, 'table') && 'OnRegister' in value && typeIs(value.OnRegister, 'function')
-}
-
-export interface IOnStop {
-	// Only guaranteed to be on server shutdown
-	// Only called on client on a manual `Service.Stop()`
-	OnStop(): void | Promise<void>
-}
-
-export function IOnStop(value: unknown): value is IOnStop {
-	return typeIs(value, 'table') && 'OnStop' in value && typeIs(value.OnStop, 'function')
-}
+export type ServiceState = 'registering' | 'starting' | 'running' | 'stopping' | 'stopped'

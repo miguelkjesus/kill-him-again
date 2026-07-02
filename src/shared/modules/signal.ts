@@ -86,6 +86,5 @@ export interface ISignalEvent<Args extends unknown[] = any[]> {
 }
 
 export interface ISignalConnection {
-	IsConnected(): boolean
 	Disconnect(): void
 }

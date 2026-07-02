@@ -61,7 +61,7 @@ const servicesImpl = {
 		if (instance === undefined) error('Tried to get unregistered service.')
 
 		switch (instance.GetState()) {
-			case 'created':
+			case 'registering':
 			case 'starting':
 				await instance.Started.Wait()
 				return instance
