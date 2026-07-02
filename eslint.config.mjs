@@ -19,7 +19,7 @@ export default defineConfig(
 		languageOptions: {
 			parserOptions: {
 				projectService: {
-					allowDefaultProject: ['eslint.config.mjs'],
+					allowDefaultProject: ['eslint.config.mjs', 'scripts/*'],
 				},
 				tsconfigRootDir: import.meta.dirname,
 			},
@@ -37,6 +37,7 @@ export default defineConfig(
 			// Disable rules that conflict with roblox-ts
 			'@typescript-eslint/no-require-imports': 'off',
 			// Disable rules that conflict with regular tsc type checking
+			'no-undef': 'off',
 			'@typescript-eslint/no-unsafe-argument': 'off',
 			'@typescript-eslint/unbound-method': 'off',
 			'@typescript-eslint/no-unsafe-member-access': 'off',
