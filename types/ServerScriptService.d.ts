@@ -1,6 +1,8 @@
 interface ServerScriptService extends Instance {
 	TS: Folder & {
 		main: Script;
-		services: Folder;
+		services: Folder & {
+			foo: ModuleScript;
+		};
 	};
 }

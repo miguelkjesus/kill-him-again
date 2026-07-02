@@ -7,7 +7,9 @@ interface ReplicatedStorage extends Instance {
 			maid: ModuleScript;
 			signal: ModuleScript;
 		};
-		services: Folder;
+		services: Folder & {
+			bar: ModuleScript;
+		};
 	};
 	rbxts_include: Folder & {
 		RuntimeLib: ModuleScript;
