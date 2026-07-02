@@ -2,7 +2,7 @@ name: check service types
 
 on:
     push:
-        branches: [main]
+        branches: [master]
     pull_request:
 
 jobs:
