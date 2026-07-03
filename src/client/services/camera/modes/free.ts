@@ -7,7 +7,7 @@ import { CameraState } from '../camera-state'
 export class FreeCameraMode extends CameraMode {
 	private readonly _Maid = new Maid()
 
-	private readonly _cameraSensitivity = 0.0025
+	private readonly _cameraSensitivity = 0.004
 	private readonly _pitchLimit = math.rad(85)
 	private readonly _moveSpeed = 50
 
