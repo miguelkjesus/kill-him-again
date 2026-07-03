@@ -26,7 +26,7 @@ export abstract class Service {
 
 	protected OnStart?(): void | Promise<void>
 
-	protected OnPreRender?(): void | Promise<void>
+	protected OnPreRender?(deltaTime: number): void | Promise<void>
 
 	protected OnStop?(): void | Promise<void>
 
@@ -64,7 +64,9 @@ export abstract class Service {
 
 		if (RunService.IsClient()) {
 			if ('OnPreRender' in this) {
-				this.__maid.Add(RunService.PreRender.Connect(() => void Promise.try(() => this.OnPreRender!())))
+				this.__maid.Add(
+					RunService.PreRender.Connect((deltaTime) => void Promise.try(() => this.OnPreRender!(deltaTime))),
+				)
 			}
 		}
 

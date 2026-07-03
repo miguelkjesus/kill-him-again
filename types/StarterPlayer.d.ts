@@ -54,9 +54,14 @@ interface StarterPlayer extends Instance {
 		TS: Folder & {
 			main: LocalScript;
 			services: Folder & {
+				["init-service"]: ModuleScript;
 				camera: ModuleScript & {
-					["camera-state"]: ModuleScript;
 					["camera-service"]: ModuleScript;
+					["camera-state"]: ModuleScript;
+					modifiers: Folder;
+					modes: ModuleScript & {
+						free: ModuleScript;
+					};
 					["camera-mode"]: ModuleScript;
 					["camera-modifier"]: ModuleScript;
 				};
