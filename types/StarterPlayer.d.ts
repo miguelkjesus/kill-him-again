@@ -57,10 +57,10 @@ interface StarterPlayer extends Instance {
 				["init-service"]: ModuleScript;
 				camera: ModuleScript & {
 					["camera-service"]: ModuleScript;
-					["camera-state"]: ModuleScript;
 					modifiers: Folder;
+					["camera-state"]: ModuleScript;
 					modes: ModuleScript & {
-						free: ModuleScript;
+						["free-camera-mode"]: ModuleScript;
 					};
 					["camera-mode"]: ModuleScript;
 					["camera-modifier"]: ModuleScript;

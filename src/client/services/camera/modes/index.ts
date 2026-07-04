@@ -1,1 +1,1 @@
-export * from './free'
+export * from './free-camera-mode'
