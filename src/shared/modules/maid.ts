@@ -19,8 +19,12 @@ export class Maid {
 		this._items.clear()
 	}
 
+	Size() {
+		return this._items.size()
+	}
+
 	IsEmpty() {
-		this._items.clear()
+		return this.Size() === 0
 	}
 
 	Clean() {
