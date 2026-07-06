@@ -1,4 +1,16 @@
 interface ReplicatedStorage extends Instance {
+	DungeonRooms: Folder & {
+		Room: Model & {
+			NextOrigin: Attachment;
+			RoomBox: Part;
+			Base: Part;
+		};
+		Spawn: Model & {
+			NextOrigin: Attachment;
+			RoomBox: Part;
+			Base: Part;
+		};
+	};
 	TS: Folder & {
 		modules: Folder & {
 			["service-registry"]: ModuleScript;

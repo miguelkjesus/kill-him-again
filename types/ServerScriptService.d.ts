@@ -2,7 +2,10 @@ interface ServerScriptService extends Instance {
 	TS: Folder & {
 		main: Script;
 		services: Folder & {
-			foo: ModuleScript;
+			["init-service"]: ModuleScript;
+			["dungeon-generator-service"]: ModuleScript & {
+				["dungeon-generator-service"]: ModuleScript;
+			};
 		};
 	};
 }
