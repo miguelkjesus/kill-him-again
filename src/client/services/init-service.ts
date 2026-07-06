@@ -1,8 +1,8 @@
 import { Service } from 'shared/modules/service'
 import { Services } from 'shared/modules/service-registry'
 
-import { FreeCameraMode } from './camera/modes'
-import { CameraService } from './camera'
+import { FreeCameraMode } from './camera-service/modes'
+import { CameraService } from './camera-service'
 
 @Services.Declare
 export class InitService extends Service {
